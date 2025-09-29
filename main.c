@@ -44,7 +44,7 @@ int main(){
     char player = 'A';
     int col;
     int count=0;
-    while(count<42){
+    while(count<43){
         printf("Player %c, choose a column (1-7): ", player);
         scanf("%d", &col);
         drop(board, col,player, &count);
