@@ -47,6 +47,10 @@ int main(){
     while(count<42){
         printf("Player %c, choose a column (1-7): ", player);
         scanf("%d", &col);
+        while(col<1 || col>7){
+            printf("Enter a number between 1 and 7: ");
+            scanf("%d", &col);
+        }
         drop(board, col,player, &count);
         if(player == 'A'){
             player = 'B';
