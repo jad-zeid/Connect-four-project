@@ -34,3 +34,32 @@ void drop(char board[6][7], int col, char player, int* count){
         }
     }
 }
+
+int checkHorizontal(char board[6][7], char player){
+    for(int r=0; r<6; r++){ //loop through all the rows
+        for(int c=0; c<=3; c++){ //checks horizontal from column 0-3, if c=0 then it checks (0,1,2,3) thats why c<=3 since c=3 checks (3,4,5,6) hence covering all possible 4s in a row
+            if(board[r][c] == player && //current location the player is at
+               board[r][c+1] == player && //next column 
+               board[r][c+2] == player && //2 columns next
+               board[r][c+3] == player){ //3 columns next
+                return player; //if all 4 are true then the player achieved 4 in a row horizontally and the system returns the player who won(A or B)
+               }
+        }
+    }
+    return '\0'; //no horizontal 4 in a row achieved 
+}
+
+int checkVertical(char board[6][7], char player){
+    for (int c = 0; c < 7; c++) { //loop through all the columns 
+        for (int r = 0; r <= 2; r++) { //check vertical from row 0-2, r=0 checks (0,1,2,3) the next 4rows therefore r<=2 since r=3 is invalid(checks 3,4,5,6->invalid)
+            if (board[r][c] == player && //current location of the player (last checker played)
+                board[r+1][c] == player && //next row
+                board[r+2][c] == player && // 2rows next
+                board[r+3][c] == player) { //3rows next
+                return player; //player achieved vertical 4 in a row and the system returns the player that won (A or B)
+            }
+        }
+    }
+    return '\0'; // no vertical 4 in a row achieved 
+}
+

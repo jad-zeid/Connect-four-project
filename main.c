@@ -19,11 +19,26 @@ int main(){
             scanf("%d", &col);
         }
         drop(board, col,player, &count);
+
+        //check for winner 
+        char winner = checkHorizontal(board, player); //or checkVertical both work but then we change if statements
+        if (!winner) { //if no horizontal 4 in a row achieved then check vertical
+            winner = checkVertical(board, player);
+        }
+
+        if (winner) { //4 in a row achieved and we have a winner 
+            printf("Player %c wins!\n", winner);
+            break;
+        }
+
         if(player == 'A'){
             player = 'B';
         }
         else{
             player = 'A';
         }
+    }
+    if(count==42){ //all slots were taken and no one achived a 4 horizontally, vertically, or diagonally
+        printf("No player wins. Draw!");
     }
 }
