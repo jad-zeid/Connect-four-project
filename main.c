@@ -38,7 +38,7 @@ void drop(char board[6][7], int col, char player, int* count){
 int main(){
     char board[6][7];
     printf("Welcome to Connect Four!\n");
-    printf("Player A: 21A\n");
+    printf("Player A: A\n");
     printf("Player B: B\n");
     printboard(board);
     char player = 'A';
