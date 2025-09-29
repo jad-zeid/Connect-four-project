@@ -42,7 +42,7 @@ int checkHorizontal(char board[6][7], char player){
                board[r][c+1] == player && //next column 
                board[r][c+2] == player && //2 columns next
                board[r][c+3] == player){ //3 columns next
-                return player; //if all 4 are true then the player achieved 4 in a row horizontally and the system returns the player who won(A or B)
+                return player; //if all 4 are true then the player achieved 4 in a row and the system returns the player who won(A or B)
                }
         }
     }
@@ -56,10 +56,10 @@ int checkVertical(char board[6][7], char player){
                 board[r+1][c] == player && //next row
                 board[r+2][c] == player && // 2rows next
                 board[r+3][c] == player) { //3rows next
-                return player; //player achieved vertical 4 in a row and the system returns the player that won (A or B)
+                return player; //player achieved vertical consecutive 4 and the system returns the player that won (A or B)
             }
         }
     }
-    return '\0'; // no vertical 4 in a row achieved 
+    return '\0'; // no vertical consecutive 4 achieved 
 }
 

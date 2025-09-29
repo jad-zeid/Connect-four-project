@@ -22,11 +22,11 @@ int main(){
 
         //check for winner 
         char winner = checkHorizontal(board, player); //or checkVertical both work but then we change if statements
-        if (!winner) { //if no horizontal 4 in a row achieved then check vertical
+        if (!winner) { //if no horizontal 4 consecutively achieved then check vertical
             winner = checkVertical(board, player);
         }
 
-        if (winner) { //4 in a row achieved and we have a winner 
+        if (winner) { //4 consecutively achieved and we have a winner 
             printf("Player %c wins!\n", winner);
             break;
         }
