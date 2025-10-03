@@ -88,7 +88,7 @@ int checkVertical(char board[6][7], char player){
     }
 
     if (count >= 4) {
-        if (player == 'A') return 1;
+        if (player == 'A') return 1; //return 1 for player A and 2 For player B
         else return 2;
     }
 
