@@ -61,7 +61,7 @@ int checkVertical(char board[6][7], char player){
         }
     }
     return '\0'; // no vertical consecutive 4 achieved 
-
+}
 
     int checkDiagonal(char board[6][7],char player,int col,int row){
     int count = 1;
@@ -121,5 +121,4 @@ int checkVertical(char board[6][7], char player){
     return 0;
 }
 
-}
 
