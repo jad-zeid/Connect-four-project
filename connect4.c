@@ -22,7 +22,7 @@ void printboard(char board[6][7]){
     printf("\n");
 }
 
-void drop(char board[6][7], int col, char player, int* count){
+int drop(char board[6][7], int col, char player, int* count){
     col = col-1;
     for(int r=0;r<6;r++){
         char place = board[r][col];
@@ -30,7 +30,7 @@ void drop(char board[6][7], int col, char player, int* count){
             board[r][col]=player;
             printboard(board);
             (*count)++;
-            return;
+            return r;
         }
     }
 }
@@ -61,5 +61,65 @@ int checkVertical(char board[6][7], char player){
         }
     }
     return '\0'; // no vertical consecutive 4 achieved 
+
+
+    int checkDiagonal(char board[6][7],char player,int col,int row){
+    int count = 1;
+    
+
+    // Check \ diagonal (top-left to bottom-right)
+
+    // Up-left
+    int r = row - 1;
+    int c = col - 1;
+    while (r >= 0 && c >= 0 && board[r][c] == player) {
+        count++;
+        r--;
+        c--;
+    }
+
+    // Down-right
+    r = row + 1;
+    c = col + 1;
+    while (r < 6 && c < 7 && board[r][c] == player) {
+        count++;
+        r++;
+        c++;
+    }
+
+    if (count >= 4) {
+        if (player == 'A') return 1;
+        else return 2;
+    }
+
+    // Reset count for / diagonal
+    count = 1;
+
+    // Up-right
+    r = row - 1;
+    c = col + 1;
+    while (r >= 0 && c < 7 && board[r][c] == player) {
+        count++;
+        r--;
+        c++;
+    }
+
+    // Down-left
+    r = row + 1;
+    c = col - 1;
+    while (r < 6 && c >= 0 && board[r][c] == player) {
+        count++;
+        r++;
+        c--;
+    }
+
+    if (count >= 4) {
+        if (player == 'A') return 1;
+        else return 2;
+    }
+
+    return 0;
+}
+
 }
 

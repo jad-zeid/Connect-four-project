@@ -18,7 +18,7 @@ int main(){
             printf("Enter a number between 1 and 7: ");
             scanf("%d", &col);
         }
-        drop(board, col,player, &count);
+         int row = drop(board, col,player, &count);
 
         //check for winner 
         char winner = checkHorizontal(board, player); //or checkVertical both work but then we change if statements
