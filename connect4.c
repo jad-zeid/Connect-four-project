@@ -33,6 +33,7 @@ int drop(char board[6][7], int col, char player, int* count){
             return r;
         }
     }
+    return -1;
 }
 
 int checkHorizontal(char board[6][7], char player){
@@ -88,8 +89,7 @@ int checkVertical(char board[6][7], char player){
     }
 
     if (count >= 4) {
-        if (player == 'A') return 1; //return 1 for player A and 2 For player B
-        else return 2;
+        return player;
     }
 
     // Reset count for / diagonal
@@ -114,11 +114,10 @@ int checkVertical(char board[6][7], char player){
     }
 
     if (count >= 4) {
-        if (player == 'A') return 1;
-        else return 2;
+        return player;
     }
 
-    return 0;
+    return '\0';
 }
 
 
