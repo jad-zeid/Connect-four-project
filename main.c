@@ -37,7 +37,7 @@ int main(){
     int count=0;
     while(count<42){ //end game when max number of pieces is reached
         if(mode ==2 && player=='B'){ //easy bot mode 
-            printf("Easy Bot's turn\n");
+            printf("Bot's turn\n");
             col= easybot(board);
             printf("Bot chose column %d\n", col);
         }
