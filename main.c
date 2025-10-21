@@ -23,8 +23,14 @@ int main(){
         scanf("%d", &mode);
     }
     srand(time(NULL));
-    printf("Player A: A\n");
-    printf("Player B: B\n");
+    if(mode ==1){
+        printf("Player A: A\n");
+        printf("Player B: B\n");
+    }
+    else {
+        printf("Player A: A\n");
+        printf("Player B: Bot\n");
+    }
     printboard(board);
     char player = 'A';
     int col;
