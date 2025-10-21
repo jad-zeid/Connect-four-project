@@ -39,7 +39,7 @@ int main(){
         if(mode ==2 && player=='B'){ //easy bot mode 
             printf("Easy Bot's turn\n");
             col= easybot(board);
-            printf("Easy Bot chose column %d\n", col);
+            printf("Bot chose column %d\n", col);
         }
         else{ //real player turn
             printf("Player %c, choose a column (1-7): ", player);
@@ -54,7 +54,7 @@ int main(){
           while (row == -1) { // column full
             if(mode ==2 && player =='B'){
                 col = easybot(board);
-                printf("Easy Bot chose column %d\n", col);
+                printf("Bot chose column %d\n", col);
                 row = drop(board,col,player,&count);
             }
             else{
