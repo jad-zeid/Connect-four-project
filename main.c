@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "connect4.h"
 
 
@@ -10,26 +12,50 @@ int main(){
         }
     }
 
+    int mode;
     printf("Welcome to Connect Four!\n");
+    printf("Choose mode:\n");
+    printf("Enter 1 for player vs player\n");
+    printf("Enter 2 for player vs bot (level easy)\n");
+    scanf("%d", &mode);
+    while(mode !=1 && mode != 2){ //check if number entered is valid
+        printf("Invalid number for mode\n");
+        scanf("%d", &mode);
+    }
+    srand(time(NULL));
     printf("Player A: A\n");
     printf("Player B: B\n");
     printboard(board);
     char player = 'A';
     int col;
     int count=0;
-    while(count<42){
-        printf("Player %c, choose a column (1-7): ", player);
-        scanf("%d", &col);
-        while(col<1 || col>7){
-            printf("Enter a number between 1 and 7: ");
+    while(count<42){ //end game when max number of pieces is reached
+        if(mode ==2 && player=='B'){ //easy bot mode 
+            printf("Easy Bot's turn\n");
+            col= easybot(board);
+            printf("Easy Bot chose column %d\n", col);
+        }
+        else{ //real player turn
+            printf("Player %c, choose a column (1-7): ", player);
             scanf("%d", &col);
+            while(col<1 || col>7){
+                printf("Enter a number between 1 and 7: ");
+                scanf("%d", &col);
+            }
         }
 
          int row = drop(board, col,player, &count);
           while (row == -1) { // column full
-            printf("Column full! Choose another column: ");
-            scanf("%d", &col);
-            row = drop(board, col, player, &count);
+            if(mode ==2 && player =='B'){
+                col = easybot(board);
+                printf("Easy Bot chose column %d\n", col);
+                row = drop(board,col,player,&count);
+            }
+            else{
+                printf("Column full! Choose another column: ");
+                scanf("%d", &col);
+                row = drop(board, col, player, &count);
+            }
         }
 
         //check for winner 

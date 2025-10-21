@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "connect4.h"
 
+//display the board of the game
 void printboard(char board[6][7]){
     for(int r=5;r>=0;r--){
         for(int c=0;c<7;c++){
@@ -22,6 +24,7 @@ void printboard(char board[6][7]){
     printf("\n");
 }
 
+//drop piece
 int drop(char board[6][7], int col, char player, int* count){
     col = col-1;
     for(int r=0;r<6;r++){
@@ -118,6 +121,19 @@ int checkVertical(char board[6][7], char player){
     }
 
     return '\0';
+}
+
+// make the bot choose a random column that isnt full
+int easybot(char board[6][7]){
+    int col;
+    int valid =0;
+    do{
+        col =(rand() % 7)+1;
+        if (board[5][col-1]!= 'A' && board[5][col-1]!= 'B' ){
+            valid=1;
+        }
+    }while (valid == 0);
+    return col;
 }
 
 
