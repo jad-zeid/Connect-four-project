@@ -22,7 +22,7 @@ int main(){
         printf("Invalid number for mode\n");
         scanf("%d", &mode);
     }
-    srand(time(NULL));
+    srand(time(NULL)); //to get random number after every execution, not the same indentical numbers
     if(mode ==1){
         printf("Player A: A\n");
         printf("Player B: B\n");
