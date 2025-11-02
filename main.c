@@ -3,88 +3,111 @@
 #include <time.h>
 #include "connect4.h"
 
+#define ROWS 6
+#define COLS 7
 
-int main(){
-    char board[6][7];
-    for (int r = 0; r < 6; r++) { //board initialization
-        for (int c = 0; c < 7; c++) {
+// Initialize board
+void initializeBoard(char board[ROWS][COLS]) {
+    for (int r = 0; r < ROWS; r++) {
+        for (int c = 0; c < COLS; c++) {
             board[r][c] = '.';
         }
     }
+}
+
+// Switch player turn
+char switchPlayer(char current) {
+    return (current == 'A') ? 'B' : 'A';
+}
+
+// Get user column input safely
+int getPlayerMove(char player) {
+    int col;
+    printf("Player %c, choose a column (1–7): ", player);
+    while (scanf("%d", &col) != 1 || col < 1 || col > 7) {
+        while (getchar() != '\n'); // clear buffer
+        printf("Invalid input. Enter a number between 1–7: ");
+    }
+    return col;
+}
+
+int main() {
+    char board[ROWS][COLS];
+    initializeBoard(board);
 
     int mode;
     printf("Welcome to Connect Four!\n");
-    printf("Choose mode:\n");
-    printf("Enter 1 for player vs player\n");
-    printf("Enter 2 for player vs bot (level easy)\n");
-    scanf("%d", &mode);
-    while(mode !=1 && mode != 2){ //check if number entered is valid
-        printf("Invalid number for mode\n");
-        scanf("%d", &mode);
+    printf("Select mode:\n");
+    printf("1 → Player vs Player\n");
+    printf("2 → Player vs Bot (Easy)\n");
+    printf("3 → Player vs Bot (Medium)\n");
+
+    while (scanf("%d", &mode) != 1 || mode < 1 || mode > 3) {
+        while (getchar() != '\n'); // flush invalid input
+        printf("Invalid choice. Enter 1, 2, or 3: ");
     }
-    srand(time(NULL)); //to get random number after every execution, not the same indentical numbers
-    if(mode ==1){
-        printf("Player A: A\n");
-        printf("Player B: B\n");
-    }
-    else {
-        printf("Player A: A\n");
-        printf("Player B: Bot\n");
-    }
+
+    srand(time(NULL));
+
+    printf("\nPlayer A: A");
+    if (mode == 1) printf("\nPlayer B: B");
+    else printf("\nPlayer B: Bot");
+    printf("\n\n");
+
     printboard(board);
+
     char player = 'A';
-    int col;
-    int count=0;
-    while(count<42){ //end game when max number of pieces is reached
-        if(mode ==2 && player=='B'){ //easy bot mode 
-            col= easybot(board);
-            printf("Bot chose column %d\n", col);
-        }
-        else{ //real player turn
-            printf("Player %c, choose a column (1-7): ", player);
-            scanf("%d", &col);
-            while(col<1 || col>7){
-                printf("Enter a number between 1 and 7: ");
-                scanf("%d", &col);
-            }
+    int count = 0;
+    while (count < ROWS * COLS) {
+        int col;
+
+        // Bot moves
+        if ((mode == 2 || mode == 3) && player == 'B') {
+            if (mode == 2)
+                col = easybot(board);
+            else
+                col = mediumbot(board);
+
+            printf("\nBot chose column %d\n", col);
+        } 
+        // Human move
+        else {
+            col = getPlayerMove(player);
         }
 
-         int row = drop(board, col,player, &count);
-          while (row == -1) { // column full
-            if(mode ==2 && player =='B'){
-                col = easybot(board);
-                printf("Bot chose column %d\n", col);
-                row = drop(board,col,player,&count);
-            }
-            else{
+        int row = drop(board, col, player, &count);
+        while (row == -1) { // handle full column
+            if ((mode == 2 || mode == 3) && player == 'B') {
+                col = (mode == 2) ? easybot(board) : mediumbot(board);
+                printf("Column full, bot chose column %d instead\n", col);
+                row = drop(board, col, player, &count);
+            } else {
                 printf("Column full! Choose another column: ");
-                scanf("%d", &col);
+                col = getPlayerMove(player);
                 row = drop(board, col, player, &count);
             }
         }
 
-        //check for winner 
-        char winner = checkHorizontal(board, player); //or checkVertical both work but then we change if statements
-        if (!winner) { //if no horizontal 4 consecutively achieved then check vertical
-            winner = checkVertical(board, player);
-        }
-        if(!winner){ //if neither horizontal nor vertical, check diagonal
-            winner = checkDiagonal(board, player, col-1, row);
-        }
+        printf("\n");
+        printboard(board);
+        fflush(stdout); // fixes display delay in Alpine/TTY
 
-        if (winner) { //4 consecutively achieved and we have a winner 
-            printf("Player %c wins!\n", winner);
+        // Check for winner
+        char winner = checkHorizontal(board, player);
+        if (!winner) winner = checkVertical(board, player);
+        if (!winner) winner = checkDiagonal(board, player, col - 1, row);
+
+        if (winner) {
+            printf("\n Player %c wins!\n", winner);
             break;
         }
 
-        if(player == 'A'){
-            player = 'B';
-        }
-        else{
-            player = 'A';
-        }
+        player = switchPlayer(player);
     }
-    if(count==42){ //all slots were taken and no one achived a 4 horizontally, vertically, or diagonally
-        printf("No player wins. Draw!");
+
+    if (count == ROWS * COLS) {
+        printf("\nIt's a draw!\n");
     }
+
+    return 0;
 }

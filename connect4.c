@@ -31,7 +31,6 @@ int drop(char board[6][7], int col, char player, int* count){
         char place = board[r][col];
         if(place !='A' && place != 'B'){
             board[r][col]=player;
-            printboard(board);
             (*count)++;
             return r;
         }
@@ -134,6 +133,72 @@ int easybot(char board[6][7]){
         }
     }while (valid == 0);
     return col;
+}
+
+
+int mediumbot(char board[6][7]) {
+    char bot = 'B';
+    char player = 'A';
+
+    // Try to win
+    for (int c = 1; c <= 7; c++) {
+        if (board[5][c - 1] != 'A' && board[5][c - 1] != 'B') {
+            int r;
+            for (r = 0; r < 6; r++) {
+                if (board[r][c - 1] == '.') {
+                    board[r][c - 1] = bot;
+                    break;
+                }
+            }
+
+            if (checkHorizontal(board, bot) == bot ||
+                checkVertical(board, bot) == bot ||
+                checkDiagonal(board, bot, c - 1, r) == bot) {
+                board[r][c - 1] = '.'; // undo
+                return c; // play here to win
+            }
+
+            board[r][c - 1] = '.'; // undo
+        }
+    }
+
+    // Try to block opponent’s win
+    for (int c = 1; c <= 7; c++) {
+        if (board[5][c - 1] != 'A' && board[5][c - 1] != 'B') {
+            int r;
+            for (r = 0; r < 6; r++) {
+                if (board[r][c - 1] == '.') {
+                    board[r][c - 1] = player;
+                    break;
+                }
+            }
+
+            if (checkHorizontal(board, player) == player ||
+                checkVertical(board, player) == player ||
+                checkDiagonal(board, player, c - 1, r) == player) {
+                board[r][c - 1] = '.'; // undo
+                return c; // block here
+            }
+
+            board[r][c - 1] = '.'; // undo
+        }
+    }
+
+    // Prefer center column if possible
+    if (board[5][3] == '.') {
+        return 4;
+    }
+
+    // Otherwise pick a random valid column
+    int validCols[7], count = 0;
+    for (int c = 1; c <= 7; c++) {
+        if (board[5][c - 1] == '.') {
+            validCols[count++] = c;
+        }
+    }
+
+    if (count == 0) return 1; // fallback
+    return validCols[rand() % count];
 }
 
 
