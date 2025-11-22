@@ -41,10 +41,11 @@ int main() {
     printf("1 → Player vs Player\n");
     printf("2 → Player vs Bot (Easy)\n");
     printf("3 → Player vs Bot (Medium)\n");
+    printf("4 → Player vs Bot (Hard)\n");
 
-    while (scanf("%d", &mode) != 1 || mode < 1 || mode > 3) {
+    while (scanf("%d", &mode) != 1 || mode < 1 || mode > 4) {
         while (getchar() != '\n'); // flush invalid input
-        printf("Invalid choice. Enter 1, 2, or 3: ");
+        printf("Invalid choice. Enter 1, 2, 3 or 4: ");
     }
 
     srand(time(NULL));
@@ -62,11 +63,13 @@ int main() {
         int col;
 
         // Bot moves
-        if ((mode == 2 || mode == 3) && player == 'B') {
+        if ((mode == 2 || mode == 3 || mode == 4) && player == 'B') {
             if (mode == 2)
                 col = easybot(board);
-            else
+            else if (mode == 3)
                 col = mediumbot(board);
+                else 
+                col = hardbot(board);
 
             printf("\nBot chose column %d\n", col);
         } 
@@ -77,10 +80,18 @@ int main() {
 
         int row = drop(board, col, player, &count);
         while (row == -1) { // handle full column
-            if ((mode == 2 || mode == 3) && player == 'B') {
-                col = (mode == 2) ? easybot(board) : mediumbot(board);
+            if ((mode == 2 || mode == 3 || mode == 4) && player == 'B') {
+                 if (mode == 2)
+            col = easybot(board);
+        else if (mode == 3)
+            col = mediumbot(board);
+        else
+            col = hardbot(board);
+
                 printf("Column full, bot chose column %d instead\n", col);
+
                 row = drop(board, col, player, &count);
+                
             } else {
                 printf("Column full! Choose another column: ");
                 col = getPlayerMove(player);
