@@ -201,4 +201,73 @@ int mediumbot(char board[6][7]) {
     return validCols[rand() % count];
 }
 
+int hardbot(char board[6][7]){
+    int bestCol= 4; //center column best way to start the game, higher chance of winning 
+    int bestScore= -10000000; //initiliazing to worst possible score since there is no neg infinity in C 
+
+    //hardbot moves
+    for(int col=1; col<=7; col++){  //loop through columns
+        int countTemp=0; //not related to actual count
+        int row= drop(board, col, 'B', &countTemp); //AI dropping piece in column
+        
+        if(row==-1) 
+        continue; //column full, skip
+
+        //checking winning move for hardbot
+        if(checkHorizontal(board,'B') || //check horizontal win 
+           checkVertical(board,'B') || //check vertical win
+           checkDiagonal(board,'B', col-1, row)){ //check diagonal win 
+            board[row][col-1]='.'; //undo
+            return col; //return column since it is winning move
+           }
+
+           //scoring 
+           int score=0; //initiliaze score for column 
+
+           if (col==4) //center is strongest
+           score+=50; //think of it as weight, the higher the better the move 
+
+           if(col==3 || col==5) //next to center also strong, not as much as center
+           score+=25;  
+
+           for(int c=0; c<6; c++){ //check 2 in a row 
+            if(board[row][c]=='B' && board[row][c+1]=='B')
+            score+=40; 
+           }
+
+           for(int c=0; c<5; c++){ //check 3 in a row
+            if(board[row][c]=='B' && board[row][c+1]=='B' && board[row][c+2]=='B')
+            score+=100; 
+           }
+
+           board[row][col-1]='.'; //undo
+
+           if(score>bestScore){ //keep track of column with best score
+            bestScore=score; //update bestscore
+            bestCol=col; //update bestcol
+           }
+    }
+
+    //block player A moves
+    for(int col=1; col<=7; col++){ //loop through columns 
+        int countTemp=0;
+        int row= drop(board, col, 'A', &countTemp); //player A's move
+
+        if(row==-1)
+        continue; //column is full, skip
+
+        //check win move for player A
+        if(checkHorizontal(board, 'A') || //check horizontal win
+           checkVertical(board, 'A') || //check vertical win
+           checkDiagonal(board, 'A', col-1, row)){  //check diagonal win
+
+            board[row][col-1]='.'; //undo
+            return col; //place in column and block player A
+           }
+
+           board[row][col-1]=='.'; //undo
+    }
+
+    return bestCol; //place piece in column since it has highest column and highest chance of winning 
+}
 
