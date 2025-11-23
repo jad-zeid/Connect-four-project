@@ -265,7 +265,7 @@ int hardbot(char board[6][7]){
             return col; //place in column and block player A
            }
 
-           board[row][col-1]=='.'; //undo
+           board[row][col-1]='.'; //undo
     }
 
     return bestCol; //place piece in column since it has highest column and highest chance of winning 
