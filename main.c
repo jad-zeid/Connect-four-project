@@ -23,10 +23,10 @@ char switchPlayer(char current) {
 // Get user column input safely
 int getPlayerMove(char player) {
     int col;
-    printf("Player %c, choose a column (1–7): ", player);
+    printf("Player %c, choose a column (1-7): ", player);
     while (scanf("%d", &col) != 1 || col < 1 || col > 7) {
         while (getchar() != '\n'); // clear buffer
-        printf("Invalid input. Enter a number between 1–7: ");
+        printf("Invalid input. Enter a number between 1-7: ");
     }
     return col;
 }
@@ -119,6 +119,7 @@ int main() {
     if (count == ROWS * COLS) {
         printf("\nIt's a draw!\n");
     }
+
 
     return 0;
 }
