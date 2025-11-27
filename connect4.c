@@ -240,6 +240,64 @@ int hardbot(char board[6][7]){
             score+=100; 
            }
 
+        for (int c = 0; c < 4; c++){ //check open 3s
+            if (board[row][c]=='B' && board[row][c+1]=='B' && board[row][c+2]=='B' && board[row][c+3]=='.') //left to right
+                score += 200;
+
+            if (board[row][c]=='.' && board[row][c+1]=='B' && board[row][c+2]=='B' && board[row][c+3]=='B') //right to left
+                score += 200;
+        }
+
+        //check vertical
+        // 2 vertical potential, 1 piece under
+        if (row <= 4 && board[row+1][col-1]=='B')
+            score += 30;
+
+        // 3 vertical potential, 2 pieces under
+        if (row <= 3 && board[row+1][col-1]=='B' && board[row+2][col-1]=='B')
+            score += 80;
+
+        //check diagonal
+        
+        // diagonal bottom left to top right pattern
+        if (col <= 6 && row <= 4 && board[row+1][col]=='B') 
+            score += 40;
+
+        if (col <= 5 && row <= 3 && board[row+1][col]=='B' && board[row+2][col+1]=='B')
+            score += 60;
+
+        // diagonal top right to bottom left pattern
+        if (col >= 2 && row <= 4 && board[row+1][col-2]=='B')
+            score += 40;
+
+        if (col >= 3 && row <= 3 && board[row+1][col-2]=='B' && board[row+2][col-3]=='B')
+            score += 60;
+
+        if (row >= 1 && board[row-1][col-1] == 'A') //avoid any move that lets player A win
+            score -= 100;
+
+        //check any move that might give player A chance to win in next piece drop
+        int lose = 0;
+        for (int oppCol = 1; oppCol <= 7; oppCol++)
+        {
+            int x = 0;
+            int oppRow = drop(board, oppCol, 'A', &x);
+
+            if (oppRow != -1)
+            {
+                //very bad play if player A can win in next move
+                if (checkHorizontal(board,'A') ||
+                    checkVertical(board,'A')   ||
+                    checkDiagonal(board,'A', oppCol-1, oppRow))
+                    lose = 1;
+
+                board[oppRow][oppCol-1] = '.'; // undo
+            }
+        }
+        if (lose)
+            score -= 500; //very bad move
+
+
            board[row][col-1]='.'; //undo
 
            if(score>bestScore){ //keep track of column with best score
