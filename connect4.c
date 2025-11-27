@@ -201,6 +201,212 @@ int mediumbot(char board[6][7]) {
     return validCols[rand() % count];
 }
 
+// Score a group of 4 cells to check for winning patterns and threats
+int scoreFourCells(char window[4], char player, char opponent) {
+    int score = 0;
+    int playerCount = 0;
+    int opponentCount = 0;
+    int emptyCount = 0;
+    
+    for (int c = 0; c < 4; c++) {
+        if (window[c] == player) playerCount++;
+        else if (window[c] == opponent) opponentCount++;
+        else emptyCount++;
+    }
+    
+    // Scoring based on piece count
+    if (playerCount == 4) score += 100000; // winning
+    else if (playerCount == 3 && emptyCount == 1) score += 100; // 3 in a row with open spot
+    else if (playerCount == 2 && emptyCount == 2) score += 40; // 2 in a row with open spots
+    
+    // Penalize opponent threats
+    if (opponentCount == 3 && emptyCount == 1) score -= 80; // block opponent 3 in a row
+    
+    return score;
+}
+
+// Score the entire board to determine who has the advantage
+int scoreBoardPosition(char board[6][7], char player, char opponent) {
+    int score = 0;
+    char window[4];
+    
+    // Center column preference (col index 3 is center)
+    for (int row = 0; row < 6; row++) {
+        if (board[row][3] == player) score += 50;
+    }
+    
+    // Next to center columns (col 2 and 4)
+    for (int row = 0; row < 6; row++) {
+        if (board[row][2] == player) score += 25;
+        if (board[row][4] == player) score += 25;
+    }
+    
+    // Horizontal scoring
+    for (int row = 0; row < 6; row++) {
+        for (int c = 0; c < 4; c++) {
+            for (int i = 0; i < 4; i++) window[i] = board[row][c + i];
+            score += scoreFourCells(window, player, opponent);
+        }
+    }
+    
+    // Vertical scoring
+    for (int col = 0; col < 7; col++) {
+        for (int row = 0; row < 3; row++) {
+            for (int i = 0; i < 4; i++) window[i] = board[row + i][col];
+            score += scoreFourCells(window, player, opponent);
+        }
+    }
+    
+    // Diagonal (bottom-left to top-right) scoring
+    for (int row = 0; row < 3; row++) {
+        for (int c = 0; c < 4; c++) {
+            for (int i = 0; i < 4; i++) window[i] = board[row + i][c + i];
+            score += scoreFourCells(window, player, opponent);
+        }
+    }
+    
+    // Diagonal (top-left to bottom-right) scoring
+    for (int row = 3; row < 6; row++) {
+        for (int c = 0; c < 4; c++) {
+            for (int i = 0; i < 4; i++) window[i] = board[row - i][c + i];
+            score += scoreFourCells(window, player, opponent);
+        }
+    }
+    
+    return score;
+}
+
+// Check if the board is full (draw)
+int isBoardFull(char board[6][7]) {
+    for (int col = 0; col < 7; col++) {
+        if (board[5][col] != 'A' && board[5][col] != 'B') return 0;
+    }
+    return 1;
+}
+
+// Check if any player has won
+int checkWinner(char board[6][7], char player) {
+    // Check horizontal
+    if (checkHorizontal(board, player)) return 1;
+    // Check vertical
+    if (checkVertical(board, player)) return 1;
+    // Check all diagonals
+    for (int row = 0; row < 6; row++) {
+        for (int col = 0; col < 7; col++) {
+            if (board[row][col] == player) {
+                if (checkDiagonal(board, player, col, row)) return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// Minimax with Alpha-Beta Pruning
+int minimax(char board[6][7], int depth, int alpha, int beta, int isMaximizing, char bot, char player) {
+    // Terminal conditions
+    if (checkWinner(board, bot)) return 100000 + depth; // Bot wins (prefer faster wins)
+    if (checkWinner(board, player)) return -100000 - depth; // Player wins (avoid faster losses)
+    if (isBoardFull(board) || depth == 0) return scoreBoardPosition(board, bot, player); // Draw or depth limit
+    
+    if (isMaximizing) {
+        int bestScore = -10000000; // worst possible score for maximizer
+        for (int col = 1; col <= 7; col++) {
+            int countTemp = 0;
+            int row = drop(board, col, bot, &countTemp);
+            if (row == -1) continue; // column full, skip
+            
+            int score = minimax(board, depth - 1, alpha, beta, 0, bot, player);
+            board[row][col - 1] = '.'; // undo move
+            
+            if (score > bestScore) bestScore = score;
+            if (score > alpha) alpha = score;
+            if (beta <= alpha) break; // Alpha-Beta pruning
+        }
+        return bestScore;
+    } else {
+        int bestScore = 10000000; // worst possible score for minimizer
+        for (int col = 1; col <= 7; col++) {
+            int countTemp = 0;
+            int row = drop(board, col, player, &countTemp);
+            if (row == -1) continue; // column full, skip
+            
+            int score = minimax(board, depth - 1, alpha, beta, 1, bot, player);
+            board[row][col - 1] = '.'; // undo move
+            
+            if (score < bestScore) bestScore = score;
+            if (score < beta) beta = score;
+            if (beta <= alpha) break; // Alpha-Beta pruning
+        }
+        return bestScore;
+    }
+}
+
+int hardbot(char board[6][7]){
+    int bestCol = 4; // center column best way to start the game, higher chance of winning
+    int bestScore = -10000000; // initializing to worst possible score since there is no neg infinity in C
+    int alpha = -10000000; // alpha for alpha-beta pruning
+    int beta = 10000000; // beta for alpha-beta pruning
+    int depth = 6; // search depth for minimax (increase for stronger AI, decrease for faster)
+    
+    // First check for immediate winning move for hardbot
+    for (int col = 1; col <= 7; col++) {
+        int countTemp = 0;
+        int row = drop(board, col, 'B', &countTemp);
+        
+        if (row == -1) continue; // column full, skip
+        
+        // checking winning move for hardbot
+        if (checkHorizontal(board, 'B') || // check horizontal win
+            checkVertical(board, 'B') || // check vertical win
+            checkDiagonal(board, 'B', col - 1, row)) { // check diagonal win
+            board[row][col - 1] = '.'; // undo
+            return col; // return column since it is winning move
+        }
+        board[row][col - 1] = '.'; // undo
+    }
+    
+    // Block player A's immediate winning move
+    for (int col = 1; col <= 7; col++) {
+        int countTemp = 0;
+        int row = drop(board, col, 'A', &countTemp); // player A's move
+        
+        if (row == -1) continue; // column is full, skip
+        
+        // check win move for player A
+        if (checkHorizontal(board, 'A') || // check horizontal win
+            checkVertical(board, 'A') || // check vertical win
+            checkDiagonal(board, 'A', col - 1, row)) { // check diagonal win
+            board[row][col - 1] = '.'; // undo
+            return col; // place in column and block player A
+        }
+        board[row][col - 1] = '.'; // undo
+    }
+    
+    // Use minimax with alpha-beta pruning to find best move
+    for (int col = 1; col <= 7; col++) {
+        int countTemp = 0;
+        int row = drop(board, col, 'B', &countTemp); // AI dropping piece in column
+        
+        if (row == -1) continue; // column full, skip
+        
+        // Run minimax to get score for this move
+        int score = minimax(board, depth - 1, alpha, beta, 0, 'B', 'A');
+        
+        board[row][col - 1] = '.'; // undo
+        
+        if (score > bestScore) { // keep track of column with best score
+            bestScore = score; // update bestscore
+            bestCol = col; // update bestcol
+        }
+        
+        // Update alpha for root level pruning
+        if (score > alpha) alpha = score;
+    }
+    
+    return bestCol; // place piece in column since it has highest score and highest chance of winning
+}
+
+/*
 int hardbot(char board[6][7]){
     int bestCol= 4; //center column best way to start the game, higher chance of winning 
     int bestScore= -10000000; //initiliazing to worst possible score since there is no neg infinity in C 
@@ -328,4 +534,4 @@ int hardbot(char board[6][7]){
 
     return bestCol; //place piece in column since it has highest column and highest chance of winning 
 }
-
+    */
